@@ -64,7 +64,7 @@ func AddrToKey(addr Addr) string {
 	s := strings.Split(addr.ip, ".")
 	seed := fmt.Sprintf("%v%v%v", addr.port, s[2], s[3])
 	fmt.Println(seed)
-	adjective := words.Adjectives[0]
+	adjective := words.Adjectives[]
 	noun := words.Nouns[0]
 
 	key = fmt.Sprintf("%v-%v", adjective, noun)
