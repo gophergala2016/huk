@@ -1,7 +1,6 @@
 package main
 
 import(
-    // "github.com/nchudleigh/huk/search"
     "fmt"
     "strings"
     "os"
@@ -41,27 +40,12 @@ func main(){
         // recieves clients public key
         // encrypt file using client's pub key
         // send encrypted file over stream to client
-    }else {
+    } else {
         // Find server IP by going through list (192.168.0.[1..255]:port_x)
         // connection established
         // generate pgp (private and public keys)
         // send public key to server
         // save encrypted file from stream
         // decrypt using private key
-
     }
-
-
-    // Decide between these two based on args file, key
-    // if file:
-        // server
-    // else:
-        // client
-
-
-
-
-    // myIp := search.GetMyLocalIP()
-    // fmt.Printf("%v\n", myIp)
-    // search.FindBuddysIP()
 }
