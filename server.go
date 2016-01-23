@@ -58,7 +58,7 @@ func handleClient(conn *net.UDPConn) {
 
     switch chatRequest.Action {
     case "New":
-           remoteAddr := fmt.Sprintf("%s:%d", addr.IP, addr.Port)
+        remoteAddr := fmt.Sprintf("%s:%d", addr.IP, addr.Port)
         fmt.Println(remoteAddr, "connecting")
         userIP[chatRequest.Username] = remoteAddr
 
@@ -76,15 +76,14 @@ func handleClient(conn *net.UDPConn) {
         conn.WriteToUDP(jsonRequest, addr)
     case "Get":
         // Send message back
-                peerAddr := ""
-                if _, ok := userIP[chatRequest.Message]; ok {
-                        peerAddr = userIP[chatRequest.Message]
-                }
-
+        peerAddr := ""
+        if _, ok := userIP[chatRequest.Message]; ok {
+            peerAddr = userIP[chatRequest.Message]
+        }
         messageRequest := ChatRequest{
             "Chat",
             chatRequest.Username,
-                        peerAddr,
+            peerAddr,
         }
         jsonRequest, err := json.Marshal(&messageRequest)
         if err != nil {
