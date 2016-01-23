@@ -6,6 +6,8 @@ import (
 	"os"
 )
 
+// example code thaks to:
+// http://stackoverflow.com/questions/1821811/how-to-read-write-from-to-file/33863391
 func main() {
 	// open input file
 	fi, err := os.Open("./crime-and-punishment.txt")

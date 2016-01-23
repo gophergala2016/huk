@@ -1,25 +1,46 @@
-package main
+package client
 
 import (
 	"bufio"
-	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
 )
 
-func main() {
+func RunWithIO(fileName string) {
 	// open output file
-	fout, err := os.Create("output.txt")
+	fout, err := os.Create(fileName)
 	if err != nil {
 		panic(err)
 	}
 
-	defer func() {
-		if err := fout.Close(); err != nil {
-			panic(err)
-		}
-	}()
+	// close the output file
+	defer fout.Close()
+
+	conn, err := net.Dial("tcp", "localhost:9001")
+
+	if err != nil {
+		// do something
+	}
+
+	numWritten, err := io.Copy(fout, conn)
+
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(numWritten)
+}
+
+func Run(fileName string) {
+	// open output file
+	fout, err := os.Create(fileName)
+	if err != nil {
+		panic(err)
+	}
+
+	// close the output file
+	defer fout.Close()
 
 	w := bufio.NewWriter(fout)
 
@@ -29,32 +50,20 @@ func main() {
 		// do something
 	}
 
-	inBuffer := make([]byte, 4096)
-	n, _ := bufio.NewReader(conn).Read(inBuffer)
-
-	n, _ = w.Write(inBuffer[:n])
-
-	w.Flush()
-
-	//fmt.Println(string(inBuffer))
-}
-
-// only does one file. move file opening here. (what about locks?)
-func handler(conn net.Conn, reader *bufio.Reader) {
-	log.Print("send File start")
-	//var currentByte int = 0
-	outBuffer := make([]byte, 2048)
-
+	inBuffer := make([]byte, 2048)
+	log.Print("receive File start")
 	for {
-		// read a chunk
-		n, err := reader.Read(outBuffer)
-		if err != nil {
-			fmt.Println("something went wrong with handler")
-			fmt.Println(n, err)
+		numRead, err := conn.Read(inBuffer)
+
+		if err != nil || numRead == 0 {
+			log.Print(numRead, err)
+			break
 		}
-		// write that chunk to outgoing request
-		n, err = conn.Write(outBuffer[0:n])
+
+		numWritten, _ := w.Write(inBuffer[:numRead])
+
+		log.Print(numRead, numWritten)
+		w.Flush()
 	}
 
-	conn.Close()
 }
