@@ -1,5 +1,5 @@
-# huk
-### the simple-encrypted-local-command-line-filesharing-tool
+## huk
+### the simple-encrypted-local-command-line-filesharing tool
 
 If you are sending the file, type:
 
