@@ -7,6 +7,9 @@ import (
 	"os"
 )
 
+// to be used with a filename and return a new Reader of it.
+// the Reader object is to be used to transmit.
+// May need to be modified to be private.
 func GetHandle(fileName string) (*Reader, error) {
 	_, err := isFile(fileName)
 
@@ -28,6 +31,7 @@ func GetHandle(fileName string) (*Reader, error) {
 	return reader, nil
 }
 
+// Main loop
 func Serve() {
 	ln, err := net.Listen("tcp", ":1993")
 	if err != nil {
@@ -42,6 +46,8 @@ func Serve() {
 	}
 
 }
+
+// TCP Handler
 func handleIncomingConnection(conn net.Conn) {
 	buf := make([]byte, 4096)
 
@@ -51,8 +57,9 @@ func handleIncomingConnection(conn net.Conn) {
 	fmt.Printf("Did a thing %v", conn)
 }
 
-func isFile(arg string) bool {
+// helper function that checks for file existance.
+func isFile(arg string) (bool, err) {
 	// TODO add a logic to handle empty file
-	return os.Stat(arg)
-
+	fileInfo, err := os.Stat(arg)
+	return err != nil, err
 }
