@@ -1,5 +1,5 @@
 ## huk
-### the simple-encrypted-local-command-line-filesharing tool
+##### the minimal local network encrypted filesharing tool
 
 If you are sending the file, type:
 
@@ -11,10 +11,10 @@ For example 'bluemonkey'.
 
 Give that to your friend.
 
-If you are receiving the file, and your friend has told you the key, type:
+If you are receiving the file, type:
 
 `$ huk bluemonkey`
 
-The file will be downloaded to your huk folder and decrypted.
+The file will be downloaded to your huk folder ( default ~/huk ) and decrypted.
 
 All keys, including those used for encryption/decryption are one time use and will be thrown away.
