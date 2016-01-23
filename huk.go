@@ -19,7 +19,7 @@ func main(){
     var isClient bool
 
 
-    if args[0] == "-f" && len(args) == 2{
+    if len(args) == 2 && args[0] == "-f" {
         // Server Case
         filename=args[1]
         key = strings.ToLower(randomdata.SillyName())
