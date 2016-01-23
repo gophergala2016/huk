@@ -16,21 +16,29 @@ func main(){
 
     var filename string
     var key string
-    var isClient boolean
+    var isClient bool
+
 
     if args[0] == "-f" && len(args) == 2{
-        // server case
+        // Server Case
         filename=args[1]
         key = strings.ToLower(randomdata.SillyName())
         isClient = false
     } else if len(args) == 1{
-        // client case
+        // Client Case
         key = args[0]
         isClient = true
+        // make sure key doesnt have anything but alphabet
+        if !isAlpha(key){
+            log.Fatal("Key may only contain Lowercase Alphabetic characters")
+        }
     } else {
-        // error
+        // Invalid Args
         log.Fatal("I need either a filename or a key ex: '$ huk -f filename.txt' or '$ huk key'")
     }
+
+    fmt.Println("filename",filename)
+    fmt.Println("key", key)
 
     if isClient{
         // create server on port_x
@@ -48,4 +56,14 @@ func main(){
         // save encrypted file from stream
         // decrypt using private key
     }
+}
+
+
+func isAlpha(input string) bool {
+    for _,c := range input{
+        if 'a'>c || c > 'z'{
+            return false
+        }
+    }
+    return true
 }
