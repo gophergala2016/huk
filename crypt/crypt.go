@@ -4,13 +4,13 @@ import (
 	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
-	"fmt"
+	_ "fmt"
 	"hash"
 	"log"
 )
 
 // EncryptFile encrypts file and returns encrypted file
-func EncryptFile(file []byte, publicKey *rsa.PublicKey) ([]byte){
+func EncryptFile(file []byte, publicKey *rsa.PublicKey) []byte {
 	var encrypted, label []byte
 
 	encrypted = encryptOaep(publicKey, file, label)
@@ -21,7 +21,7 @@ func EncryptFile(file []byte, publicKey *rsa.PublicKey) ([]byte){
 }
 
 // DecryptFile decrypts file and returns OG file
-func DecryptFile(file []byte, privateKey *rsa.PrivateKey) ([]byte){
+func DecryptFile(file []byte, privateKey *rsa.PrivateKey) []byte {
 	var decrypted, label []byte
 
 	decrypted = decryptOaep(privateKey, file, label)
@@ -39,7 +39,7 @@ func GenerateKeys() (*rsa.PublicKey, *rsa.PrivateKey) {
 	var err error
 
 	// Generate Private Key
-	if privateKey, err = rsa.GenerateKey(rand.Reader, 1024); err != nil {
+	if privateKey, err = rsa.GenerateKey(rand.Reader, 4096); err != nil {
 		log.Fatal(err)
 	}
 	//fmt.Printf("Private Key: %v\n\n\n", privateKey)
@@ -72,7 +72,7 @@ func encryptOaep(publicKey *rsa.PublicKey, plainText, label []byte) (encrypted [
 	return
 }
 
-func decryptOaep(privateKey *rsa.PrivateKey, encrypted, label []byte) (decrypted[]byte) {
+func decryptOaep(privateKey *rsa.PrivateKey, encrypted, label []byte) (decrypted []byte) {
 	var err error
 	var md5Hash hash.Hash
 
@@ -83,5 +83,3 @@ func decryptOaep(privateKey *rsa.PrivateKey, encrypted, label []byte) (decrypted
 
 	return
 }
-
-

@@ -2,6 +2,8 @@ package client
 
 import (
 	"bufio"
+	"crypto/x509"
+	"github.com/gophergala2016/huk/crypt"
 	"io"
 	"log"
 	"net"
@@ -43,6 +45,7 @@ func ReceiveInOneChunk(ipAddr string, port string, fileName string) {
 	log.Println(numWritten, "bytes received, written to ", fileName)
 }
 
+//const BLOCK_SIZE = 200
 const BLOCK_SIZE = 2048
 
 // Receives file in blocks
@@ -95,6 +98,17 @@ func receiveHandshake(ipAddr string, port string) (net.Conn, string, string, err
 	if err != nil {
 		log.Fatal(err)
 	}
+	//publicKey, privateKey := crypt.GenerateKeys()
+	publicKey, _ := crypt.GenerateKeys()
+	payload, err := x509.MarshalPKIXPublicKey(publicKey)
+
+	if err != nil {
+		log.Fatal("encryption failed", err)
+	}
+	conn.Write(payload)
+	//conn.Write([]byte("AAAAAAAAAAAA"))
+	//conn.Write([]byte(string(publicKey)))
+	// GenerateKeys()
 
 	message, _ := bufio.NewReader(conn).ReadString('\102')
 	parsedMessage := strings.Split(message, ":")
