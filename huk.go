@@ -2,17 +2,20 @@ package main
 
 import (
 	"fmt"
+	"github.com/gophergala2016/huk/client"
 	"github.com/gophergala2016/huk/config"
 	"github.com/gophergala2016/huk/key"
+	"github.com/gophergala2016/huk/server"
 	"log"
 	"os"
-	// "server"
+	"strconv"
 )
 
 func main() {
 
 	var filename string
 	var myKey string
+	var addr key.Addr
 
 	args := os.Args[1:]
 	action := args[0]
@@ -23,7 +26,8 @@ func main() {
 	case "send":
 		// server
 		filename = args[1]
-		myKey = key.AddrToKey(key.MyAddress())
+		addr = key.MyAddress()
+		myKey = key.AddrToKey(addr)
 		fmt.Printf(
 			"The key for your file (%v) is %v.\n"+
 				"Tell your friend to run '$ huk %v'\n"+
@@ -32,6 +36,7 @@ func main() {
 			myKey,
 			myKey,
 		)
+		server.Run(strconv.Itoa(addr.Port), filename)
 		// create server on port_x
 		// listen for connections
 		// validate incoming request with given key
@@ -40,16 +45,21 @@ func main() {
 		// encrypt file using client's pub key
 		// send encrypted file over stream to client
 	case "get":
+		myKey = args[1]
 		fmt.Printf(
 			"Searching for '%v' on your local network..\n",
 			myKey,
 		)
 		// Client Case
-		myKey = args[0]
+		targetAddr := key.ToAddr(myKey)
+		log.Println(myKey, "->", targetAddr)
 		// make sure key doesnt have anything but alphabet
-		if !isAlpha(myKey) {
-			log.Fatal("Key may only contain Lowercase Alphabetic characters")
-		}
+		log.Println(targetAddr.Ip, strconv.Itoa(targetAddr.Port), "output")
+		client.Receive(targetAddr.Ip, strconv.Itoa(targetAddr.Port), "output")
+		// if !isAlpha(myKey) {
+		// 	log.Fatal("Key may only contain Lowercase Alphabetic characters")
+		// }
+
 		// Find server IP by going through list (192.168.0.[1..255]:port_x)
 		// connection established
 		// generate pgp (private and public keys)
