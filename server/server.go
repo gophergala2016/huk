@@ -2,64 +2,97 @@ package server
 
 import (
 	"bufio"
-	"fmt"
+	_ "fmt"
+	"io"
+	"log"
 	"net"
 	"os"
 )
 
-// to be used with a filename and return a new Reader of it.
-// the Reader object is to be used to transmit.
-// May need to be modified to be private.
-func GetHandle(fileName string) (*Reader, error) {
-	_, err := isFile(fileName)
+type HukServer struct {
+	fileName string
+	// TODO extend this to serve more than one file
+	// fileList map[string][string]
 
+	// TODO add a list of currently-ongoing-goroutines that're serving?
+}
+
+func Run(port, fileName string) {
+	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
-		return nil, err
+		log.Println("error listening to port "+port, err)
+		return
 	}
+	connections := makeChannels(listener)
+	for {
+		//go serveInChunk(<-connections, fileName)
+		go serveInBlock(<-connections, fileName)
+	}
+}
 
+func makeChannels(listener net.Listener) chan net.Conn {
+	channel := make(chan net.Conn)
+	// perpetually run this concurrently
+	go func() {
+		for {
+			conn, err := listener.Accept()
+			if err != nil {
+				log.Println("error accepting connection", err)
+				return
+			}
+			channel <- conn
+		}
+	}()
+	return channel
+}
+
+func serveInChunk(conn net.Conn, fileName string) {
 	file, err := os.Open(fileName)
-
+	file, err = encryptFile(file, "")
 	if err != nil {
-		return nil, err
+		log.Println("error opening "+fileName, err)
+		return
 	}
+	defer file.Close()
+
+	numSent, err := io.Copy(conn, file)
+	if err != nil {
+		log.Println(err)
+	}
+	log.Println(numSent, " sent to ", conn.LocalAddr().String())
+
+	// finish with this client
+	conn.Close()
+}
+
+func encryptFile(file *os.File, key string) (*os.File, error) {
+	return file, nil
+}
+
+func serveInBlock(conn net.Conn, fileName string) {
+	file, err := os.Open(fileName)
+	file, err = encryptFile(file, "")
+	if err != nil {
+		log.Println("error opening "+fileName, err)
+		return
+	}
+	defer file.Close()
 
 	reader := bufio.NewReader(file)
-	if err != nil {
-		return nil, err
-	}
-
-	return reader, nil
-}
-
-// Main loop
-func Serve() {
-	ln, err := net.Listen("tcp", ":1993")
-	if err != nil {
-		// handle error
-	}
+	outBuffer := make([]byte, 2048)
 	for {
-		conn, err := ln.Accept()
+		// read a chunk
+		numRead, err := reader.Read(outBuffer)
 		if err != nil {
-			// handle error
+			log.Println("problem with reader")
+			log.Println(numRead, err)
+			break
 		}
-		go handleIncomingConnection(conn)
+		// write that chunk to outgoing request
+		numSent, err := conn.Write(outBuffer[0:numRead])
+		log.Println(numRead, "bytes read", numSent, "bytes sent")
 	}
 
-}
+	conn.Close()
 
-// TCP Handler
-func handleIncomingConnection(conn net.Conn) {
-	buf := make([]byte, 4096)
-
-	for {
-		n, err := c.Read(buf)
-	}
-	fmt.Printf("Did a thing %v", conn)
-}
-
-// helper function that checks for file existance.
-func isFile(arg string) (bool, err) {
-	// TODO add a logic to handle empty file
-	fileInfo, err := os.Stat(arg)
-	return err != nil, err
 }
