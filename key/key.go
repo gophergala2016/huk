@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -34,20 +33,18 @@ type Addr struct {
 // MyAddress finds the local users ip address
 func MyAddress() Addr {
 	var result Addr
+	// look up all available net interface
+	ifaces, err := net.InterfaceAddrs()
 
-	name, err := os.Hostname()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	addrs, err := net.LookupHost(name)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, a := range addrs {
-		if strings.HasPrefix(a, "192.168") {
-			result.ip = a
+	for _, iface := range ifaces {
+		log.Println(iface.String())
+		// look for LAN address
+		if strings.HasPrefix(iface.String(), "192.168") {
+			result.ip = iface.String()
 		}
 	}
 	rand.Seed(time.Now().UnixNano())
