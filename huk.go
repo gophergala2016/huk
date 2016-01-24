@@ -28,7 +28,6 @@ func main() {
 	case "send":
 		// server
 		filePath = args[1]
-		myKey = key.AddrToKey(key.MyAddress())
 		addr = key.MyAddress()
 		myKey = key.AddrToKey(addr)
 		fmt.Printf(
