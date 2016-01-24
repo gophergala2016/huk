@@ -70,6 +70,10 @@ func encryptFile(file *os.File, key string) (*os.File, error) {
 	return file, nil
 }
 
+//func encryptBlock(reader *bufio.Reader, key string) (*bufio.Reader, error) {
+//	return reader, nil
+//}
+
 func serveInBlock(conn net.Conn, fileName string) {
 	file, err := os.Open(fileName)
 	file, err = encryptFile(file, "")
