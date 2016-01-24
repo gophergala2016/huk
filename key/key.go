@@ -7,20 +7,19 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	// "strconv"
+	"strconv"
 	"strings"
 	"time"
 )
 
-type wordLibrary struct {
-	Adjectives []string `json:adjectives`
-	Nouns      []string `json:nouns`
+type jsonLibrary struct {
+	Words []string
 }
 
-var words = wordLibrary{}
+var library = jsonLibrary{}
 
 func init() {
-	err := json.Unmarshal(data, &words)
+	err := json.Unmarshal(data, &library)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -52,7 +51,7 @@ func MyAddress() Addr {
 		}
 	}
 	rand.Seed(time.Now().UnixNano())
-	result.port = rand.Intn(9999)
+	result.port = 4000 + rand.Intn(999)
 
 	return result
 }
@@ -61,21 +60,47 @@ func MyAddress() Addr {
 func AddrToKey(addr Addr) string {
 	var key string
 
-	s := strings.Split(addr.ip, ".")
-	seed := fmt.Sprintf("%v%v%v", addr.port, s[2], s[3])
-	fmt.Println(seed)
-	adjective := words.Adjectives[0]
-	noun := words.Nouns[0]
+	ip := strings.Split(addr.ip, ".")
+	s1, err := strconv.Atoi(ip[2])
+	if err != nil {
+		//
+	}
+	s2, err := strconv.Atoi(ip[3])
+	if err != nil {
+		//
+	}
 
-	key = fmt.Sprintf("%v-%v", adjective, noun)
+	k1 := library.Words[s1]
+	k2 := library.Words[s2]
+	k3 := library.Words[addr.port-4000]
+
+	key = fmt.Sprintf("%v-%v-%v", k1, k2, k3)
 
 	return key
 }
 
-// ToAddr takes a key string and converts it to an address that can be connected to
+// ToAddr takes a key string and converts it to an Addr variable
 func ToAddr(key string) Addr {
 	var addr Addr
-	phrase := strings.Split(key, "-")
-	fmt.Println(phrase)
+	k := strings.Split(key, "-")
+
+	// 192.168.s1.s2:s3
+	var s1, s2, s3 int
+
+	for i, word := range library.Words {
+		if word == k[0] {
+			s1 = i
+		}
+		if word == k[1] {
+			s2 = i
+		}
+		if word == k[2] {
+			s3 = i
+		}
+	}
+
+	addr.ip = fmt.Sprintf("192.168.%v.%v", s1, s2)
+	addr.port = s3 + 4000
+
 	return addr
 }

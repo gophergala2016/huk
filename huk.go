@@ -2,10 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/Pallinder/go-randomdata"
+	"github.com/nchudleigh/huk/key"
 	"log"
 	"os"
-	"strings"
 	// "server"
 )
 
@@ -13,20 +12,20 @@ func main() {
 	args := os.Args[1:]
 
 	var filename string
-	var key string
+	var myKey string
 	var isClient bool
 
 	if len(args) == 2 && args[0] == "-f" {
 		// Server Case
 		filename = args[1]
-		key = strings.ToLower(randomdata.SillyName())
+		myKey = key.AddrToKey(key.MyAddress())
 		isClient = false
 	} else if len(args) == 1 {
 		// Client Case
-		key = args[0]
+		myKey = args[0]
 		isClient = true
 		// make sure key doesnt have anything but alphabet
-		if !isAlpha(key) {
+		if !isAlpha(myKey) {
 			log.Fatal("Key may only contain Lowercase Alphabetic characters")
 		}
 	} else {
@@ -37,7 +36,7 @@ func main() {
 	if isClient {
 		fmt.Printf(
 			"Searching for '%v' on your local network..\n",
-			key,
+			myKey,
 		)
 		// Find server IP by going through list (192.168.0.[1..255]:port_x)
 		// connection established
@@ -51,8 +50,8 @@ func main() {
 				"Tell your friend to run '$ huk %v'\n"+
 				"Waiting for connection...\n",
 			filename,
-			key,
-			key,
+			myKey,
+			myKey,
 		)
 		// create server on port_x
 		// listen for connections
