@@ -1,4 +1,6 @@
 *.swp
 *.swo
 *.DS_Store
-huk # ignore the binary until the submit
+
+# binary file
+huk
