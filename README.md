@@ -9,7 +9,9 @@ huk is also really small and easy to use, you can get started by typing:
 
 `$ huk init`
 
-huk will ask you for your name, this is a simple identifier- your first name (ex. Alice or Bob) will work just fine
+huk will ask you for your name, this is a simple identifier- your first name (ex. Alice or Bob) will work just fine.
+
+huk will also ask for your default huk folder, default is ( ~/huk )
 
 When you want to send a file, type:
 
@@ -28,3 +30,5 @@ If you are getting the file, type:
 The file will be downloaded to your huk folder ( default ~/huk ) and decrypted.
 
 All keys, including those used for encryption/decryption are one time use and will be thrown away.
+
+Thats it! Have fun! Huk it all!
