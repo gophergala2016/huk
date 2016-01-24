@@ -6,7 +6,7 @@ import (
 	"github.com/gophergala2016/huk/config"
 	// "github.com/gophergala2016/huk/crypt"
 	"github.com/gophergala2016/huk/key"
-	"github.com/gophergala2016/huk/server"
+	// "github.com/gophergala2016/huk/server"
 	"log"
 	"os"
 	"strconv"
@@ -16,7 +16,7 @@ func main() {
 
 	var filePath string
 	var myKey string
-	var addr key.Addr
+	var myAddr key.Addr
 
 	args := os.Args[1:]
 	action := args[0]
@@ -28,9 +28,11 @@ func main() {
 	case "send":
 		// server
 		filePath = args[1]
-		myKey = key.AddrToKey(key.MyAddress())
-		addr = key.MyAddress()
-		myKey = key.AddrToKey(addr)
+		myAddr = key.MyAddress()
+		myKey = key.AddrToKey(myAddr)
+		fmt.Printf("Address %v:%v \n", myAddr.IP, myAddr.Port)
+		fmt.Printf("Conversion to Key: %v \n", myKey)
+		fmt.Println("Converted Back to Address", key.ToAddr(myKey))
 		fmt.Printf(
 			"The key for your file (%v) is %v.\n"+
 				"Tell your friend to run '$ huk %v'\n"+
@@ -39,7 +41,7 @@ func main() {
 			myKey,
 			myKey,
 		)
-		server.Run(strconv.Itoa(addr.Port), filePath)
+		// server.Run(strconv.Itoa(myAddr.Port), filePath)
 		// create server on port_x
 		// listen for connections
 		// validate incoming request with given key
@@ -57,8 +59,8 @@ func main() {
 		targetAddr := key.ToAddr(myKey)
 		log.Println(myKey, "->", targetAddr)
 		// make sure key doesnt have anything but alphabet
-		log.Println(targetAddr.Ip, strconv.Itoa(targetAddr.Port), "output")
-		client.Receive(targetAddr.Ip, strconv.Itoa(targetAddr.Port), "output")
+		log.Println(targetAddr.IP, strconv.Itoa(targetAddr.Port), "output")
+		client.Receive(targetAddr.IP, strconv.Itoa(targetAddr.Port), "output")
 		// if !isAlpha(myKey) {
 		// 	log.Fatal("Key may only contain Lowercase Alphabetic characters")
 		// }

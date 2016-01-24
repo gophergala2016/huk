@@ -24,15 +24,16 @@ func init() {
 	}
 }
 
-// Addr a simple ip and port type
+// Addr is a simple ip and port type
 type Addr struct {
-	Ip   string
+	IP   string
 	Port int
 }
 
 // MyAddress finds the local users ip address
 func MyAddress() Addr {
 	var result Addr
+
 	// look up all available net interface
 	ifaces, err := net.InterfaceAddrs()
 
@@ -43,13 +44,14 @@ func MyAddress() Addr {
 	for _, iface := range ifaces {
 		// look for LAN address
 		if strings.HasPrefix(iface.String(), "192.168") {
-			result.Ip = iface.String()
+			fmt.Println(iface.String())
+			result.IP = strings.Split(iface.String(), "/")[0]
+
+			fmt.Println(result.IP)
 		}
 	}
 	rand.Seed(time.Now().UnixNano())
 	result.Port = 4000 + rand.Intn(999)
-
-	log.Println("listening on ", result.Ip, ":", result.Port)
 
 	return result
 }
@@ -58,14 +60,16 @@ func MyAddress() Addr {
 func AddrToKey(addr Addr) string {
 	var key string
 
-	Ip := strings.Split(addr.Ip, ".")
-	s1, err := strconv.Atoi(Ip[2])
+	IP := strings.Split(addr.IP, ".")
+	s1, err := strconv.Atoi(IP[2])
 	if err != nil {
-		//
+		fmt.Println(err)
+		panic(err)
 	}
-	s2, err := strconv.Atoi(Ip[3])
+	s2, err := strconv.Atoi(IP[3])
 	if err != nil {
-		//
+		fmt.Println(err)
+		panic(err)
 	}
 
 	k1 := library.Words[s1]
@@ -82,6 +86,8 @@ func ToAddr(key string) Addr {
 	var addr Addr
 	k := strings.Split(key, "-")
 
+	fmt.Println(k)
+
 	// 192.168.s1.s2:s3
 	var s1, s2, s3 int
 
@@ -97,8 +103,27 @@ func ToAddr(key string) Addr {
 		}
 	}
 
-	addr.Ip = fmt.Sprintf("192.168.%v.%v", s1, s2)
+	addr.IP = fmt.Sprintf("192.168.%v.%v", s1, s2)
 	addr.Port = s3 + 4000
 
 	return addr
+}
+
+func testLibraryForDoubles() {
+	var res []string
+	index := 0
+	for i, w := range library.Words {
+		index = i
+		for _, p := range library.Words[index:] {
+			if w == p {
+				res = append(res, p)
+				break
+			}
+		}
+	}
+	if len(res) == 0 {
+		fmt.Println("No doubles found, good job!")
+	} else {
+		fmt.Printf("Doubles found, fix em! %v", res)
+	}
 }
