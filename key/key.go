@@ -82,7 +82,7 @@ func AddrToKey(addr Addr) string {
 	return key
 }
 
-// ToAddr takes a key string and converts it to an address that can be connected to
+// ToAddr takes a key string and converts it to an Addr variable
 func ToAddr(key string) Addr {
 	var addr Addr
 	k := strings.Split(key, "-")
