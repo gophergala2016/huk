@@ -15,8 +15,6 @@ func EncryptFile(file []byte, publicKey *rsa.PublicKey) ([]byte){
 
 	encrypted = encryptOaep(publicKey, file, label)
 
-	//fmt.Printf("OAEP Encrypted [%s] to \n[%x]\n", string(file), encrypted)
-
 	return encrypted
 }
 
@@ -25,8 +23,6 @@ func DecryptFile(file []byte, privateKey *rsa.PrivateKey) ([]byte){
 	var decrypted, label []byte
 
 	decrypted = decryptOaep(privateKey, file, label)
-
-	//fmt.Printf("OAEP Decrypted [%x] to \n[%s]\n", file, decrypted)
 
 	return decrypted
 }
@@ -42,7 +38,6 @@ func GenerateKeys() (*rsa.PublicKey, *rsa.PrivateKey) {
 	if privateKey, err = rsa.GenerateKey(rand.Reader, 1024); err != nil {
 		log.Fatal(err)
 	}
-	//fmt.Printf("Private Key: %v\n\n\n", privateKey)
 
 	// Validate Private Key -- Sanity checks on the key
 	if err = privateKey.Validate(); err != nil {
