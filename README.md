@@ -1,5 +1,5 @@
 ## huk
-##### A minimalst local network encrypted filesharing tool
+##### the minimal local network encrypted filesharing tool
 
 If you are sending the file, type:
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"key"
+	"github.com/nchudleigh/huk/key"
 )
 
 func main() {
