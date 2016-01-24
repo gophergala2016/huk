@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/gophergala2016/huk/config"
+	"github.com/gophergala2016/huk/crypt"
 	"github.com/gophergala2016/huk/key"
 	"log"
 	"os"
@@ -11,7 +12,7 @@ import (
 
 func main() {
 
-	var filename string
+	var filePath string
 	var myKey string
 
 	args := os.Args[1:]
@@ -19,19 +20,21 @@ func main() {
 
 	switch action {
 	case "init":
+		// run the initialization
 		config.Init()
 	case "send":
 		// server
-		filename = args[1]
+		// filePath = args[1]
 		myKey = key.AddrToKey(key.MyAddress())
 		fmt.Printf(
 			"The key for your file (%v) is %v.\n"+
 				"Tell your friend to run '$ huk %v'\n"+
 				"Waiting for connection...\n",
-			filename,
+			filePath,
 			myKey,
 			myKey,
 		)
+		crypt.EncryptFile([]byte("This is the payload"))
 		// create server on port_x
 		// listen for connections
 		// validate incoming request with given key
@@ -58,7 +61,7 @@ func main() {
 		// decrypt using private key
 	default:
 		// Invalid Args
-		log.Fatal("I need either a filename or a key ex: '$ huk -f filename.txt' or '$ huk key'")
+		log.Fatal("I need either a filePath or a key ex: '$ huk -f filePath.txt' or '$ huk key'")
 	}
 }
 

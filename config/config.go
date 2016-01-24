@@ -48,6 +48,7 @@ func readLines(path string) ([]string, error) {
 	return lines, scanner.Err()
 }
 
+// standard err check, for brevity
 func errCheck(e error) {
 	if e != nil {
 		fmt.Println(e)
@@ -55,6 +56,7 @@ func errCheck(e error) {
 	}
 }
 
+// pathExits returns true if file exists, false if it does not
 func pathExists(path string) bool {
 	_, err := os.Stat(path)
 	if os.IsNotExist(err) {
@@ -63,7 +65,7 @@ func pathExists(path string) bool {
 	return true
 }
 
-// Get username.
+// inputUsername prompts the user to input a username
 func inputUsername() string {
 	var username string
 	fmt.Printf("Please enter a username: ")
@@ -83,6 +85,9 @@ func inputStorageDir() string {
 	return storageDir
 }
 
+// converts all ~ in directories to the current users absolute home dir
+// creates the storage directory if it doesnt exist
+// updates/creates the config file
 func writeConfig(username string, storageDir string) {
 	// get user
 	usr, err := user.Current()
