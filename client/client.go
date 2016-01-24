@@ -40,7 +40,8 @@ func Receive(ipAddr string, port string, fileName string) {
 	// open output file
 	fout, err := os.Create(fileName)
 	if err != nil {
-		panic(err)
+		log.Println("create ", fileName, "failed...", err)
+		log.Fatal(err)
 	}
 
 	// close the output file
@@ -51,6 +52,7 @@ func Receive(ipAddr string, port string, fileName string) {
 	conn, err := net.Dial("tcp", ipAddr+":"+port)
 
 	if err != nil {
+		log.Fatal(err)
 		// do something
 	}
 

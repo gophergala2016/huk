@@ -6,7 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"net"
-	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -27,31 +26,30 @@ func init() {
 
 // Addr a simple ip and port type
 type Addr struct {
-	ip   string
-	port int
+	Ip   string
+	Port int
 }
 
 // MyAddress finds the local users ip address
 func MyAddress() Addr {
 	var result Addr
+	// look up all available net interface
+	ifaces, err := net.InterfaceAddrs()
 
-	name, err := os.Hostname()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	addrs, err := net.LookupHost(name)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	for _, a := range addrs {
-		if strings.HasPrefix(a, "192.168") {
-			result.ip = a
+	for _, iface := range ifaces {
+		// look for LAN address
+		if strings.HasPrefix(iface.String(), "192.168") {
+			result.Ip = iface.String()
 		}
 	}
 	rand.Seed(time.Now().UnixNano())
-	result.port = 4000 + rand.Intn(999)
+	result.Port = 4000 + rand.Intn(999)
+
+	log.Println("listening on ", result.Ip, ":", result.Port)
 
 	return result
 }
@@ -60,19 +58,19 @@ func MyAddress() Addr {
 func AddrToKey(addr Addr) string {
 	var key string
 
-	ip := strings.Split(addr.ip, ".")
-	s1, err := strconv.Atoi(ip[2])
+	Ip := strings.Split(addr.Ip, ".")
+	s1, err := strconv.Atoi(Ip[2])
 	if err != nil {
 		//
 	}
-	s2, err := strconv.Atoi(ip[3])
+	s2, err := strconv.Atoi(Ip[3])
 	if err != nil {
 		//
 	}
 
 	k1 := library.Words[s1]
 	k2 := library.Words[s2]
-	k3 := library.Words[addr.port-4000]
+	k3 := library.Words[addr.Port-4000]
 
 	key = fmt.Sprintf("%v-%v-%v", k1, k2, k3)
 
@@ -99,8 +97,8 @@ func ToAddr(key string) Addr {
 		}
 	}
 
-	addr.ip = fmt.Sprintf("192.168.%v.%v", s1, s2)
-	addr.port = s3 + 4000
+	addr.Ip = fmt.Sprintf("192.168.%v.%v", s1, s2)
+	addr.Port = s3 + 4000
 
 	return addr
 }

@@ -18,6 +18,7 @@ type HukServer struct {
 }
 
 func Run(port, fileName string) {
+	log.Println("Start server on Port ", port, "...")
 	listener, err := net.Listen("tcp", ":"+port)
 	if err != nil {
 		log.Println("error listening to port "+port, err)
