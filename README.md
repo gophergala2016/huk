@@ -1,19 +1,29 @@
 ## huk
-##### the minimal local network encrypted filesharing tool
+##### the minimal encrypted filesharing tool
 
-If you are sending the file, type:
+The purpose of huk is enabling filesharing between friends within wifi (lan).
 
-`$ huk -f bananas.jpeg`
+It is starbucks secure, so no one is able to listen to your traffic and see what you are sending/getting.
 
-The copied file is encrypted and a small key will be given.
+huk is also really small and easy to use, you can get started by typing:
 
-For example 'bluemonkey'.
+`$ huk init`
+
+huk will ask you for your name, this is a simple identifier- your first name (ex. Alice or Bob) will work just fine
+
+When you want to send a file, type:
+
+`$ huk send bananas.jpeg`
+
+The copied file is encrypted and a small key will be given back to you.
+
+For example 'blue-monkey-pizza'.
 
 Give that to your friend.
 
-If you are receiving the file, type:
+If you are getting the file, type:
 
-`$ huk bluemonkey`
+`$ huk get blue-monkey-pizza`
 
 The file will be downloaded to your huk folder ( default ~/huk ) and decrypted.
 
