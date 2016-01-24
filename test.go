@@ -7,6 +7,9 @@ import (
 
 func main() {
 	myAddress := key.MyAddress()
+	fmt.Println("myAddress initial", myAddress)
 	myKey := key.AddrToKey(myAddress)
-	fmt.Println(myAddress, myKey)
+	fmt.Println("converted to key", myKey)
+	myAddress = key.ToAddr(myKey)
+	fmt.Println("converted back to address", myKey)
 }
