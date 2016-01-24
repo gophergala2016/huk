@@ -21,7 +21,6 @@ func GetStorageDir() string {
 			storageDir = strings.Split(line, "=")[1]
 		}
 	}
-
 	return storageDir
 }
 
@@ -111,4 +110,5 @@ func writeConfig(username string, storageDir string) {
 	w.Flush()
 	errCheck(err)
 
+	return
 }
