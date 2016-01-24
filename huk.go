@@ -6,7 +6,7 @@ import (
 	"github.com/gophergala2016/huk/config"
 	// "github.com/gophergala2016/huk/crypt"
 	"github.com/gophergala2016/huk/key"
-	// "github.com/gophergala2016/huk/server"
+	"github.com/gophergala2016/huk/server"
 	"log"
 	"os"
 	"strconv"
@@ -41,7 +41,11 @@ func main() {
 			myKey,
 			myKey,
 		)
-		// server.Run(strconv.Itoa(myAddr.Port), filePath)
+		//server.Run(strconv.Itoa(addr.Port), filePath)
+
+		// temp
+		server.Run("9001", filePath)
+
 		// create server on port_x
 		// listen for connections
 		// validate incoming request with given key

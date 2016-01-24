@@ -26,8 +26,8 @@ func Run(port, fileName string) {
 	}
 	connections := makeChannels(listener)
 	for {
-		//go serveInChunk(<-connections, fileName)
-		go serveInBlock(<-connections, fileName)
+		go serveInChunk(<-connections, fileName)
+		//go serveInBlock(<-connections, fileName)
 	}
 }
 
@@ -36,7 +36,7 @@ func makeChannels(listener net.Listener) chan net.Conn {
 	// perpetually run this concurrently
 	go func() {
 		for {
-			conn, err := listener.Accept()
+			conn, err := serveHandshake(listener, "file")
 			if err != nil {
 				log.Println("error accepting connection", err)
 				return
@@ -99,5 +99,19 @@ func serveInBlock(conn net.Conn, fileName string) {
 	}
 
 	conn.Close()
+}
 
+func serveHandshake(listener net.Listener, fileName string) (net.Conn, error) {
+	var message string
+	conn, err := listener.Accept()
+
+	if err != nil {
+		return nil, err
+	}
+
+	message = "publickey:fileNameABC\102"
+
+	conn.Write([]byte(message))
+
+	return conn, err
 }
