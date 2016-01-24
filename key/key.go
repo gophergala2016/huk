@@ -20,7 +20,6 @@ var library = jsonLibrary{}
 
 func init() {
 	err := json.Unmarshal(data, &library)
-	fmt.Println(library)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -70,8 +69,6 @@ func AddrToKey(addr Addr) string {
 	if err != nil {
 		//
 	}
-
-	fmt.Println(addr.port-4000, s1, s2)
 
 	k1 := library.Words[s1]
 	k2 := library.Words[s2]
