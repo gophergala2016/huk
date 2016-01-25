@@ -7,7 +7,7 @@ import (
 	"log"
 	"net"
 	"os"
-	// "strings"
+	"strings"
 )
 
 // Receives file in one big chunk
@@ -102,7 +102,7 @@ func receiveHandshake(ipAddr string, port string, userName string) (net.Conn, st
 	conn.Write([]byte(outMessage + "\n"))
 
 	message, _ := bufio.NewReader(conn).ReadString('\n')
-	log.Println(message)
+	message = strings.Replace(message, "\n", "", 1)
 
 	return conn, message, nil
 }

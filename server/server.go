@@ -37,6 +37,9 @@ func makeChannels(listener net.Listener, fileName string) chan net.Conn {
 	go func() {
 		for {
 			conn, err := serveHandshake(listener, fileName)
+			if conn == nil {
+				return
+			}
 			if err != nil {
 				log.Println("error accepting connection", err)
 				return
@@ -115,21 +118,29 @@ func serveHandshake(listener net.Listener, fileName string) (net.Conn, error) {
 	}
 
 	userName, _ := bufio.NewReader(conn).ReadString('\n')
-	log.Println(userName)
+	if trustConnection(userName) {
+		message = fileName + "\n"
+		conn.Write([]byte(message))
 
-	reader := bufio.NewReader(os.Stdin)
-	fmt.Print("Enter text: ")
-	text, _ := reader.ReadString('\n')
-	log.Println(text, "Y")
-	if text == "Y" {
-		conn.Close()
-		return nil, nil
+		return conn, err
+	}
+	conn.Close()
+	return nil, nil
+
+}
+
+func trustConnection(username string) bool {
+	var trust rune
+
+	fmt.Printf("%v wants to get your file, do you trust them [Y/n]?:", username)
+
+	for trust != 'y' && trust != 'Y' && trust != 'n' && trust != 'N' {
+		fmt.Scanf("%c", &trust)
 	}
 
-	log.Println(fileName)
-
-	message = fileName + "\n"
-	conn.Write([]byte(message))
-
-	return conn, err
+	if trust == 'y' || trust == 'Y' {
+		return true
+	}
+	fmt.Printf("Whew, that was a close one, goodbye!\n")
+	return false
 }

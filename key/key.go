@@ -31,6 +31,7 @@ type Addr struct {
 }
 
 // MyAddress finds the local users ip address
+// Gives the user an option if multiple IPs
 func MyAddress() Addr {
 	var result Addr
 
@@ -41,15 +42,35 @@ func MyAddress() Addr {
 		log.Fatal(err)
 	}
 
+	var addressOptions []string
+
 	for _, iface := range ifaces {
+		fmt.Println(iface)
 		// look for LAN address
 		if strings.HasPrefix(iface.String(), "192.168") {
-			fmt.Println(iface.String())
-			result.IP = strings.Split(iface.String(), "/")[0]
-
-			fmt.Println(result.IP)
+			option := strings.Split(iface.String(), "/")[0]
+			if !stringInSlice(option, addressOptions) {
+				addressOptions = append(addressOptions, option)
+			}
 		}
 	}
+
+	if len(addressOptions) > 1 {
+		selection := -1
+		fmt.Printf("We found multiple local networks please select one:\n")
+		for i, option := range addressOptions {
+			fmt.Printf("\t%v. %v \n", i+1, option)
+		}
+		fmt.Printf("Type line number (ex. 2) and hit enter: ")
+		for selection > len(addressOptions) || selection < 1 {
+			fmt.Scanf("%d\n", &selection)
+			fmt.Printf("'%v' is invalid, try again: ", selection)
+		}
+		result.IP = addressOptions[selection-1]
+	} else {
+		result.IP = addressOptions[0]
+	}
+
 	rand.Seed(time.Now().UnixNano())
 	result.Port = 4000 + rand.Intn(999)
 
@@ -85,8 +106,6 @@ func AddrToKey(addr Addr) string {
 func ToAddr(key string) Addr {
 	var addr Addr
 	k := strings.Split(key, "-")
-
-	fmt.Println(k)
 
 	// 192.168.s1.s2:s3
 	var s1, s2, s3 int
@@ -126,4 +145,13 @@ func testLibraryForDoubles() {
 	} else {
 		fmt.Printf("Doubles found, fix em! %v", res)
 	}
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }
