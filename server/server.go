@@ -83,6 +83,8 @@ func serveInChunk(conn net.Conn, fileName string) {
 	}
 	defer file.Close()
 
+	conn.Write([]byte(fileName + "\n"))
+
 	numSent, err := io.Copy(conn, file)
 	if err != nil {
 		log.Println(err)
