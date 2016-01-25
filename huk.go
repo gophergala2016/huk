@@ -31,7 +31,7 @@ func main() {
 		myKey = key.AddrToKey(myAddr)
 		fmt.Printf(
 			"The key for your file (%v) is %v.\n"+
-				"Tell your friend to run '$ huk %v'\n"+
+				"Tell your friend to run '$ huk get %v'\n"+
 				"Waiting for connection...\n",
 			filePath,
 			myKey,
@@ -47,17 +47,16 @@ func main() {
 		// send encrypted file over stream to client
 	case "get":
 		myKey = args[1]
-		userName := args[2]
+		//userName := args[2]
 		fmt.Printf(
 			"Searching for '%v' on your local network..\n",
 			myKey,
 		)
 		// Client Case
 		targetAddr := key.ToAddr(myKey)
-		// log.Println(myKey, "->", targetAddr)
 		// make sure key doesnt have anything but alphabet
-		// log.Println(targetAddr.IP, strconv.Itoa(targetAddr.Port), "output")
-		client.ReceiveInOneChunk(targetAddr.IP, strconv.Itoa(targetAddr.Port), userName)
+		//client.ReceiveInOneChunk(targetAddr.IP, strconv.Itoa(targetAddr.Port), userName)
+		client.ReceiveInOneChunk(targetAddr.IP, strconv.Itoa(targetAddr.Port), "")
 		// Find server IP by going through list (192.168.0.[1..255]:port_x)
 		// connection established
 		// generate pgp (private and public keys)
