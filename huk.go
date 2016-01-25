@@ -57,26 +57,20 @@ func main() {
 		// send encrypted file over stream to client
 	case "get":
 		myKey = args[1]
+
 		fmt.Printf(
 			"Searching for '%v' on your local network..\n",
 			myKey,
 		)
-		// Client Case
-		targetAddr := key.ToAddr(myKey)
-		log.Println(myKey, "->", targetAddr)
-		// make sure key doesnt have anything but alphabet
-		log.Println(targetAddr.IP, strconv.Itoa(targetAddr.Port), "output")
-		client.Receive(targetAddr.IP, strconv.Itoa(targetAddr.Port), "output")
-		// if !isAlpha(myKey) {
-		// 	log.Fatal("Key may only contain Lowercase Alphabetic characters")
-		// }
+		// decifer server address from key
+		serverAddr := key.ToAddr(myKey)
+		// dial server and connect
+		conn := DialServer(serverAddr)
+		// get username from config
+		username := config.getVariable("username")
+		// send username
+		conn.Write([]byte(username))
 
-		// Find server IP by going through list (192.168.0.[1..255]:port_x)
-		// connection established
-		// generate pgp (private and public keys)
-		// send public key to server
-		// save encrypted file from stream
-		// decrypt using private key
 	default:
 		// Invalid Args
 		log.Fatal("I need either a filePath or a key ex: '$ huk -f filePath.txt' or '$ huk key'")

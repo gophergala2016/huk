@@ -6,23 +6,20 @@ import (
 	"log"
 	"net"
 	"os"
-	"strings"
+	// "strings"
 )
 
-// Receives file in one big chunk
+// ReceiveInOneChunk file in one big chunk
 func ReceiveInOneChunk(ipAddr string, port string, fileName string) {
 	// Initiate the connection
-	//conn, err := net.Dial("tcp", ipAddr+":"+port)
-	conn, key, fileName, err := receiveHandshake("192.168.1.161", "9001")
+	conn, err := net.Dial("tcp", ipAddr+":"+port)
+	// conn, key, fileName, err := receiveHandshake("192.168.1.161", "9001")
 
 	if err != nil {
 		log.Fatal("Error establishing connection.", err)
 	}
 	// Defer closing the Connection handle
 	defer conn.Close()
-
-	// Print success message
-	printHandshankeMsg(key, fileName)
 
 	// Open output file
 	fout, err := os.Create(fileName)
@@ -43,7 +40,7 @@ func ReceiveInOneChunk(ipAddr string, port string, fileName string) {
 	log.Println(numWritten, "bytes received, written to ", fileName)
 }
 
-const BLOCK_SIZE = 2048
+const blockSize = 2048
 
 // Receives file in blocks
 func Receive(ipAddr string, port string, fileName string) {
@@ -72,7 +69,7 @@ func Receive(ipAddr string, port string, fileName string) {
 
 	// File Writer Buffer init.
 	w := bufio.NewWriter(fout)
-	inBuffer := make([]byte, BLOCK_SIZE)
+	inBuffer := make([]byte, blockSize)
 
 	for {
 		numRead, err := conn.Read(inBuffer)
@@ -89,19 +86,13 @@ func Receive(ipAddr string, port string, fileName string) {
 	}
 }
 
-// Establish connection, receive key and fileName
-func receiveHandshake(ipAddr string, port string) (net.Conn, string, string, error) {
+// DialServer establish connection, receive key and fileName
+func DialServer(ipAddr string, port string) net.Conn {
 	conn, err := net.Dial("tcp", ipAddr+":"+port)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	message, _ := bufio.NewReader(conn).ReadString('\102')
-	parsedMessage := strings.Split(message, ":")
-	key := parsedMessage[0]
-	fileName := parsedMessage[1]
-
-	return conn, key, fileName, nil
+	return conn
 }
 
 func printHandshankeMsg(key, fileName string) {

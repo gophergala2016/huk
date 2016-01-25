@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// GetConfigVariable returns the requested from the config file
-func GetConfigSetting(v string) string {
+// GetVariable returns the requested from the config file
+func GetVariable(v string) string {
 	var storageDir string
 	usr, err := user.Current()
 	// read whole the file
@@ -26,7 +26,7 @@ func GetConfigSetting(v string) string {
 
 // Init runs the sequence to write the config file
 func Init() {
-	GetStorageDir()
+	GetVariable("directory")
 	username := inputUsername()
 	storageDir := inputStorageDir()
 	writeConfig(username, storageDir)

@@ -50,21 +50,20 @@ func trustConnection(username string) bool {
 
 // CreateInitialBuffer for incoming information
 func CreateInitialBuffer(conn net.Conn, filePath string) {
-	message, err := bufio.NewReader(conn).ReadString('\n')
+	username, err := bufio.NewReader(conn).ReadString('\n')
 	if err != nil {
 		fmt.Println(err)
 		panic(err)
 	}
-	fmt.Printf(message)
-	username := "dunk"
 	// read message, get username from initial message
 	trust := trustConnection(username)
 	if trust {
 		// open file
+		file := os.Open(filePath)
 
-		// send file
+		num, err := io.Copy(conn, file)
 
-		// conn.Write()
+		conn.Close()
 	}
 }
 
