@@ -2,18 +2,18 @@ package client
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
-	"strings"
+	// "strings"
 )
 
 // Receives file in one big chunk
-func ReceiveInOneChunk(ipAddr string, port string, fileName string) {
+func ReceiveInOneChunk(ipAddr string, port string, userName string) {
 	// Initiate the connection
-	//conn, err := net.Dial("tcp", ipAddr+":"+port)
-	conn, key, fileName, err := receiveHandshake("192.168.1.161", "9001")
+	conn, fileName, err := receiveHandshake(ipAddr, port, userName)
 
 	if err != nil {
 		log.Fatal("Error establishing connection.", err)
@@ -22,7 +22,6 @@ func ReceiveInOneChunk(ipAddr string, port string, fileName string) {
 	defer conn.Close()
 
 	// Print success message
-	printHandshankeMsg(key, fileName)
 
 	// Open output file
 	fout, err := os.Create(fileName)
@@ -49,7 +48,7 @@ const BLOCK_SIZE = 2048
 func Receive(ipAddr string, port string, fileName string) {
 	// Initiate the connection
 	//conn, err := net.Dial("tcp", ipAddr+":"+port)
-	conn, key, fileName, err := receiveHandshake("192.168.1.161", "9001")
+	conn, fileName, err := receiveHandshake("192.168.1.161", "9001", "")
 
 	if err != nil {
 		log.Fatal("Error establishing connection.", err)
@@ -58,7 +57,6 @@ func Receive(ipAddr string, port string, fileName string) {
 	defer conn.Close()
 
 	// Print success message
-	printHandshankeMsg(key, fileName)
 
 	// Open output file
 	fout, err := os.Create(fileName)
@@ -90,22 +88,21 @@ func Receive(ipAddr string, port string, fileName string) {
 }
 
 // Establish connection, receive key and fileName
-func receiveHandshake(ipAddr string, port string) (net.Conn, string, string, error) {
+func receiveHandshake(ipAddr string, port string, userName string) (net.Conn, string, error) {
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter UserName: ")
+	text, _ := reader.ReadString('\n')
+
+	outMessage := text + "\n"
+	//outMessage := userName + "\n"
 	conn, err := net.Dial("tcp", ipAddr+":"+port)
 	if err != nil {
 		log.Fatal(err)
 	}
+	conn.Write([]byte(outMessage + "\n"))
 
-	message, _ := bufio.NewReader(conn).ReadString('\102')
-	parsedMessage := strings.Split(message, ":")
-	key := parsedMessage[0]
-	fileName := parsedMessage[1]
+	message, _ := bufio.NewReader(conn).ReadString('\n')
+	log.Println(message)
 
-	return conn, key, fileName, nil
-}
-
-func printHandshankeMsg(key, fileName string) {
-	log.Println("Connection established...")
-	log.Println("public key: ", key)
-	log.Println("file name: ", fileName)
+	return conn, message, nil
 }

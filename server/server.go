@@ -2,7 +2,7 @@ package server
 
 import (
 	"bufio"
-	_ "fmt"
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -24,19 +24,19 @@ func Run(port, fileName string) {
 		log.Println("error listening to port "+port, err)
 		return
 	}
-	connections := makeChannels(listener)
+	connections := makeChannels(listener, fileName)
 	for {
 		go serveInChunk(<-connections, fileName)
 		//go serveInBlock(<-connections, fileName)
 	}
 }
 
-func makeChannels(listener net.Listener) chan net.Conn {
+func makeChannels(listener net.Listener, fileName string) chan net.Conn {
 	channel := make(chan net.Conn)
 	// perpetually run this concurrently
 	go func() {
 		for {
-			conn, err := serveHandshake(listener, "file")
+			conn, err := serveHandshake(listener, fileName)
 			if err != nil {
 				log.Println("error accepting connection", err)
 				return
@@ -48,6 +48,11 @@ func makeChannels(listener net.Listener) chan net.Conn {
 }
 
 func serveInChunk(conn net.Conn, fileName string) {
+	log.Println("serve in chunk")
+	if conn == nil {
+		conn.Close()
+		return
+	}
 	file, err := os.Open(fileName)
 	file, err = encryptFile(file, "")
 	if err != nil {
@@ -109,8 +114,21 @@ func serveHandshake(listener net.Listener, fileName string) (net.Conn, error) {
 		return nil, err
 	}
 
-	message = "publickey:fileNameABC\102"
+	userName, _ := bufio.NewReader(conn).ReadString('\n')
+	log.Println(userName)
 
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter text: ")
+	text, _ := reader.ReadString('\n')
+	log.Println(text, "Y")
+	if text == "Y" {
+		conn.Close()
+		return nil, nil
+	}
+
+	log.Println(fileName)
+
+	message = fileName + "\n"
 	conn.Write([]byte(message))
 
 	return conn, err
