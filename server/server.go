@@ -2,49 +2,70 @@ package server
 
 import (
 	"bufio"
-	_ "fmt"
+	"fmt"
 	"io"
 	"log"
 	"net"
 	"os"
 )
 
-type HukServer struct {
-	fileName string
-	// TODO extend this to serve more than one file
-	// fileList map[string][string]
+// Listen creates a server listening on the given port
+func Listen(port int) net.Conn {
+	var err error
 
-	// TODO add a list of currently-ongoing-goroutines that're serving?
-}
+	log.Printf("Starting server on Port %v...\n", port)
 
-func Run(port, fileName string) {
-	log.Println("Start server on Port ", port, "...")
-	listener, err := net.Listen("tcp", ":"+port)
+	// create listener on given port
+	ln, err := net.Listen("tcp", fmt.Sprintf(":%v", port))
 	if err != nil {
-		log.Println("error listening to port "+port, err)
-		return
+		log.Println(err)
+		panic(err)
 	}
-	connections := makeChannels(listener)
-	for {
-		go serveInChunk(<-connections, fileName)
-		//go serveInBlock(<-connections, fileName)
+
+	// accept connection on given port
+	conn, err := ln.Accept()
+	if err != nil {
+		log.Println(err)
+		panic(err)
 	}
+
+	return conn
 }
 
-func makeChannels(listener net.Listener) chan net.Conn {
-	channel := make(chan net.Conn)
-	// perpetually run this concurrently
-	go func() {
-		for {
-			conn, err := serveHandshake(listener, "file")
-			if err != nil {
-				log.Println("error accepting connection", err)
-				return
-			}
-			channel <- conn
-		}
-	}()
-	return channel
+func trustConnection(username string) bool {
+	var trust rune
+
+	fmt.Printf("%v wants to get your file, do you trust them [Y/n]?:", username)
+
+	for trust != 'y' && trust != 'Y' && trust != 'n' && trust != 'N' {
+		fmt.Scanf("%c", &trust)
+	}
+
+	if trust == 'y' || trust == 'Y' {
+		return true
+	}
+	fmt.Printf("Whew, that was a close one, goodbye!\n")
+	return false
+}
+
+// CreateInitialBuffer for incoming information
+func CreateInitialBuffer(conn net.Conn, filePath string) {
+	message, err := bufio.NewReader(conn).ReadString('\n')
+	if err != nil {
+		fmt.Println(err)
+		panic(err)
+	}
+	fmt.Printf(message)
+	username := "dunk"
+	// read message, get username from initial message
+	trust := trustConnection(username)
+	if trust {
+		// open file
+
+		// send file
+
+		// conn.Write()
+	}
 }
 
 func serveInChunk(conn net.Conn, fileName string) {
@@ -99,19 +120,4 @@ func serveInBlock(conn net.Conn, fileName string) {
 	}
 
 	conn.Close()
-}
-
-func serveHandshake(listener net.Listener, fileName string) (net.Conn, error) {
-	var message string
-	conn, err := listener.Accept()
-
-	if err != nil {
-		return nil, err
-	}
-
-	message = "publickey:fileNameABC\102"
-
-	conn.Write([]byte(message))
-
-	return conn, err
 }

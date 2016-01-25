@@ -8,8 +8,8 @@ import (
 	"strings"
 )
 
-// GetStorageDir returns the storage dir from the config file
-func GetStorageDir() string {
+// GetConfigVariable returns the requested from the config file
+func GetConfigSetting(v string) string {
 	var storageDir string
 	usr, err := user.Current()
 	// read whole the file
@@ -17,7 +17,7 @@ func GetStorageDir() string {
 	errCheck(err)
 
 	for _, line := range configFile {
-		if strings.Contains(line, "directory") {
+		if strings.Contains(line, v) {
 			storageDir = strings.Split(line, "=")[1]
 		}
 	}

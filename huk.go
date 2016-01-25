@@ -30,6 +30,7 @@ func main() {
 		filePath = args[1]
 		myAddr = key.MyAddress()
 		myKey = key.AddrToKey(myAddr)
+
 		fmt.Printf("Address %v:%v \n", myAddr.IP, myAddr.Port)
 		fmt.Printf("Conversion to Key: %v \n", myKey)
 		fmt.Println("Converted Back to Address", key.ToAddr(myKey))
@@ -43,11 +44,12 @@ func main() {
 		)
 		//server.Run(strconv.Itoa(addr.Port), filePath)
 
-		// temp
-		server.Run("9001", filePath)
-
-		// create server on port_x
-		// listen for connections
+		// create server on port given listen for connections
+		conn := server.Listen(myAddr.Port)
+		for {
+			CreateInitialBuffer(conn)
+			// conn.Write(file)
+		}
 		// validate incoming request with given key
 		// connection established
 		// recieves clients public key
