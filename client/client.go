@@ -6,7 +6,7 @@ import (
 	"log"
 	"net"
 	"os"
-	// "strings"
+	"strconv"
 )
 
 // ReceiveInOneChunk file in one big chunk
@@ -42,25 +42,15 @@ func ReceiveInOneChunk(ipAddr string, port string, fileName string) {
 
 const blockSize = 2048
 
-// Receives file in blocks
-func Receive(ipAddr string, port string, fileName string) {
-	// Initiate the connection
-	//conn, err := net.Dial("tcp", ipAddr+":"+port)
-	conn, key, fileName, err := receiveHandshake("192.168.1.161", "9001")
-
-	if err != nil {
-		log.Fatal("Error establishing connection.", err)
-	}
+// Receive the file in blocks
+func Receive(conn net.Conn, filePath string) {
 	// Defer closing the Connection handle
 	defer conn.Close()
 
-	// Print success message
-	printHandshankeMsg(key, fileName)
-
 	// Open output file
-	fout, err := os.Create(fileName)
+	fout, err := os.Create(filePath)
 	if err != nil {
-		log.Println("create ", fileName, "failed...", err)
+		log.Println("create ", filePath, "failed...", err)
 		log.Fatal(err)
 	}
 
@@ -87,16 +77,12 @@ func Receive(ipAddr string, port string, fileName string) {
 }
 
 // DialServer establish connection, receive key and fileName
-func DialServer(ipAddr string, port string) net.Conn {
-	conn, err := net.Dial("tcp", ipAddr+":"+port)
+func DialServer(ipAddr string, port int) net.Conn {
+	sport := strconv.Itoa(port)
+
+	conn, err := net.Dial("tcp", ipAddr+":"+sport)
 	if err != nil {
 		log.Fatal(err)
 	}
 	return conn
-}
-
-func printHandshankeMsg(key, fileName string) {
-	log.Println("Connection established...")
-	log.Println("public key: ", key)
-	log.Println("file name: ", fileName)
 }

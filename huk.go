@@ -4,12 +4,10 @@ import (
 	"fmt"
 	"github.com/gophergala2016/huk/client"
 	"github.com/gophergala2016/huk/config"
-	// "github.com/gophergala2016/huk/crypt"
 	"github.com/gophergala2016/huk/key"
 	"github.com/gophergala2016/huk/server"
 	"log"
 	"os"
-	"strconv"
 )
 
 func main() {
@@ -47,7 +45,7 @@ func main() {
 		// create server on port given listen for connections
 		conn := server.Listen(myAddr.Port)
 		for {
-			CreateInitialBuffer(conn)
+			server.CreateInitialBuffer(conn, filePath)
 			// conn.Write(file)
 		}
 		// validate incoming request with given key
@@ -65,11 +63,14 @@ func main() {
 		// decifer server address from key
 		serverAddr := key.ToAddr(myKey)
 		// dial server and connect
-		conn := DialServer(serverAddr)
+		conn := client.DialServer(serverAddr.IP, serverAddr.Port)
 		// get username from config
-		username := config.getVariable("username")
+		username := config.GetVariable("username")
+		username += "\n"
 		// send username
 		conn.Write([]byte(username))
+		directory := config.GetVariable("directory")
+		client.Receive(conn, directory+"/filename.txt")
 
 	default:
 		// Invalid Args

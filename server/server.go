@@ -59,9 +59,17 @@ func CreateInitialBuffer(conn net.Conn, filePath string) {
 	trust := trustConnection(username)
 	if trust {
 		// open file
-		file := os.Open(filePath)
+		file, err := os.Open(filePath)
+		if err != nil {
+			fmt.Println(err)
+			panic(err)
+		}
 
-		num, err := io.Copy(conn, file)
+		_, err = io.Copy(conn, file)
+		if err != nil {
+			fmt.Println(err)
+			panic(err)
+		}
 
 		conn.Close()
 	}
@@ -69,7 +77,6 @@ func CreateInitialBuffer(conn net.Conn, filePath string) {
 
 func serveInChunk(conn net.Conn, fileName string) {
 	file, err := os.Open(fileName)
-	file, err = encryptFile(file, "")
 	if err != nil {
 		log.Println("error opening "+fileName, err)
 		return
@@ -86,17 +93,8 @@ func serveInChunk(conn net.Conn, fileName string) {
 	conn.Close()
 }
 
-func encryptFile(file *os.File, key string) (*os.File, error) {
-	return file, nil
-}
-
-//func encryptBlock(reader *bufio.Reader, key string) (*bufio.Reader, error) {
-//	return reader, nil
-//}
-
 func serveInBlock(conn net.Conn, fileName string) {
 	file, err := os.Open(fileName)
-	file, err = encryptFile(file, "")
 	if err != nil {
 		log.Println("error opening "+fileName, err)
 		return
